@@ -158,21 +158,29 @@ ${liuNianList.slice(80, 100).join(', ')}
   `;
 
   try {
+    // 构建请求体
+    const requestBody: Record<string, unknown> = {
+      model: targetModel, 
+      messages: [
+        { role: "system", content: BAZI_SYSTEM_INSTRUCTION },
+        { role: "user", content: userPrompt }
+      ],
+      temperature: 0.3
+    };
+    
+    // 仅对 OpenAI 模型添加 response_format（Gemini 不支持）
+    const isGeminiModel = targetModel.toLowerCase().includes('gemini');
+    if (!isGeminiModel) {
+      requestBody.response_format = { type: "json_object" };
+    }
+
     const response = await fetch(`${cleanBaseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: targetModel, 
-        messages: [
-          { role: "system", content: BAZI_SYSTEM_INSTRUCTION },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
