@@ -6,7 +6,7 @@ import AnalysisResult from './components/AnalysisResult';
 import { UserInput, LifeDestinyResult } from './types';
 import { generateLifeAnalysis } from './services/geminiService';
 import { API_STATUS } from './constants';
-import { Sparkles, AlertCircle, BookOpen, Key } from 'lucide-react';
+import { Sparkles, AlertCircle } from 'lucide-react';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-6">
             <div className="hidden md:block text-sm text-gray-400 font-medium bg-gray-100 px-3 py-1 rounded-full">
-               基于 AI 大模型驱动 推特@0xSakura666
+               基于 AI 大模型驱动
             </div>
           </div>
         </div>
@@ -76,34 +76,6 @@ const App: React.FC = () => {
                 助您发现人生牛市，规避风险熊市，把握关键转折点。
               </p>
 
-              {/* Tutorial Buttons Group */}
-              <div className="flex flex-row gap-4 w-full max-w-lg mb-4">
-                {/* Usage Tutorial */}
-                <a 
-                  href="https://jcnjmxofi1yl.feishu.cn/wiki/OPa4woxiBiFP9okQ9yWcbcXpnEw"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 bg-white px-4 py-3 rounded-xl shadow-sm border border-indigo-100 hover:border-indigo-500 hover:shadow-md transition-all transform hover:-translate-y-0.5 group"
-                >
-                  <div className="bg-indigo-50 p-1.5 rounded-full text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <BookOpen className="w-4 h-4" />
-                  </div>
-                  <span className="text-base font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">使用教程</span>
-                </a>
-
-                {/* API Tutorial */}
-                <a 
-                  href="https://jcnjmxofi1yl.feishu.cn/wiki/JX0iwzoeqie3GEkJ8XQcMesan3c"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 bg-white px-4 py-3 rounded-xl shadow-sm border border-emerald-100 hover:border-emerald-500 hover:shadow-md transition-all transform hover:-translate-y-0.5 group"
-                >
-                  <div className="bg-emerald-50 p-1.5 rounded-full text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <Key className="w-4 h-4" />
-                  </div>
-                  <span className="text-base font-bold text-gray-800 group-hover:text-emerald-700 transition-colors">API教程</span>
-                </a>
-              </div>
             </div>
             
             <BaziForm onSubmit={handleFormSubmit} isLoading={loading} />
@@ -158,7 +130,7 @@ const App: React.FC = () => {
       {/* Footer */}
       <footer className="w-full bg-gray-900 text-gray-400 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} 人生K线项目 推特@0xSakura666 | 仅供娱乐与文化研究，请勿迷信</p>
+          <p>&copy; {new Date().getFullYear()} 人生K线项目 | 仅供娱乐与文化研究，请勿迷信</p>
         </div>
       </footer>
     </div>

@@ -36,6 +36,34 @@ export interface KLinePoint {
 
 export interface AnalysisData {
   bazi: string[]; // [Year, Month, Day, Hour] pillars
+  
+  // 新增：核心分析
+  coreAnalysis?: {
+    dayMaster: string;
+    strength: string;
+    strengthReason: string;
+    pattern: string;
+    patternReason: string;
+    usefulGod: string;
+    usefulGodReason: string;
+    favorableGod: string;
+    unfavorableGod: string;
+  } | null;
+  
+  // 新增：十神分析
+  tenGods?: {
+    distribution: string;
+    keyPatterns: string[];
+    analysis: string;
+  } | null;
+  
+  // 新增：神煞分析
+  shenSha?: {
+    auspicious: string[];
+    inauspicious: string[];
+    analysis: string;
+  } | null;
+  
   summary: string;
   summaryScore: number; // 0-10
   
@@ -44,9 +72,6 @@ export interface AnalysisData {
   
   wealth: string;
   wealthScore: number; // 0-10
-  
-  marriage: string;
-  marriageScore: number; // 0-10
   
   health: string;
   healthScore: number; // 0-10

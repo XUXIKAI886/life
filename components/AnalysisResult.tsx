@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AnalysisData } from '../types';
-import { ScrollText, Briefcase, Coins, Heart, Activity, Users, Star, Info } from 'lucide-react';
+import { ScrollText, Briefcase, Coins, Activity, Users, Star, Info } from 'lucide-react';
 
 interface AnalysisResultProps {
   analysis: AnalysisData;
@@ -99,14 +99,7 @@ const AnalysisResult: React.FC<AnalysisResultProps> = ({ analysis }) => {
           colorClass="text-amber-600" 
         />
         <Card 
-          title="婚姻情感" 
-          icon={Heart} 
-          content={analysis.marriage} 
-          score={analysis.marriageScore}
-          colorClass="text-pink-600" 
-        />
-        <Card 
-          title="身体健康" 
+          title="身体健康"
           icon={Activity} 
           content={analysis.health} 
           score={analysis.healthScore}
