@@ -146,13 +146,13 @@ ${liuNianList.slice(80, 100).join(', ')}
   - 身体健康：五行脏腑对应、易发疾病、养生建议
   - 六亲关系：父母缘、兄弟缘、子女运、贵人小人
   - 命理总评：格局层次、一生走向、关键转折点
-□ 任务7：生成1-100岁流年K线数据（每年reason字段200-300字详批）
+□ 任务7：生成1-100岁流年K线数据（每年reason字段50-80字简批，必须完整生成100条数据）
 
 【特别警告】
 ⚠️ daYun字段：必须填大运干支（10年一变），绝对不要填流年干支
 ⚠️ ganZhi字段：填流年干支（每年一变，如2024=甲辰）
-⚠️ reason字段：必须200-300字，禁止敷衍
-⚠️ 本次分析不包含婚姻感情维度
+⚠️ reason字段：50-80字简批即可，确保100年数据完整
+⚠️ chartPoints必须包含完整的1-100岁数据，不可遗漏任何年份
 
 请严格按照系统指令生成JSON数据。
   `;
@@ -227,6 +227,9 @@ ${liuNianList.slice(80, 100).join(', ')}
         healthScore: data.healthScore || 5,
         family: data.family || "无",
         familyScore: data.familyScore || 5,
+        romance: data.romance || null,
+        romanceScore: data.romanceScore || 5,
+        fiveElements: data.fiveElements || null,
       },
     };
   } catch (error) {

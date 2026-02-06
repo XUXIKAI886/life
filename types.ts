@@ -59,6 +59,27 @@ export interface AnalysisData {
     analysis: string;
   } | null;
   
+  // 新增：情感分析
+  romance?: {
+    marriagePalace: string;      // 婚姻宫分析
+    spouseStar: string;          // 配偶星分析
+    peachBlossom: string;        // 桃花运分析
+    romanceTiming: string;       // 感情时机
+    analysis: string;            // 综合情感分析
+  } | null;
+  romanceScore?: number;
+  
+  // 新增：五行喜忌开运
+  fiveElements?: {
+    favorable: string;           // 喜用神
+    unfavorable: string;         // 忌神
+    colors: string[];            // 幸运颜色
+    directions: string[];        // 有利方位
+    numbers: string[];           // 幸运数字
+    industries: string[];        // 适合行业
+    advice: string;              // 开运建议
+  } | null;
+  
   summary: string;
   summaryScore: number; // 0-10
   
