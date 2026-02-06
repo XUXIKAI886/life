@@ -2,6 +2,37 @@
 import { UserInput, LifeDestinyResult, Gender } from "../types";
 import { BAZI_SYSTEM_INSTRUCTION } from "../constants";
 
+// 六十甲子完整序列
+const SIXTY_JIAZI = [
+  '甲子', '乙丑', '丙寅', '丁卯', '戊辰', '己巳', '庚午', '辛未', '壬申', '癸酉',
+  '甲戌', '乙亥', '丙子', '丁丑', '戊寅', '己卯', '庚辰', '辛巳', '壬午', '癸未',
+  '甲申', '乙酉', '丙戌', '丁亥', '戊子', '己丑', '庚寅', '辛卯', '壬辰', '癸巳',
+  '甲午', '乙未', '丙申', '丁酉', '戊戌', '己亥', '庚子', '辛丑', '壬寅', '癸卯',
+  '甲辰', '乙巳', '丙午', '丁未', '戊申', '己酉', '庚戌', '辛亥', '壬子', '癸丑',
+  '甲寅', '乙卯', '丙辰', '丁巳', '戊午', '己未', '庚申', '辛酉', '壬戌', '癸亥'
+];
+
+// 计算大运序列（前端预计算，不依赖 AI）
+const calculateDaYunSequence = (firstDaYun: string, isForward: boolean, count: number): string[] => {
+  const startIdx = SIXTY_JIAZI.indexOf(firstDaYun);
+  if (startIdx === -1) return Array(count).fill(firstDaYun); // fallback
+  
+  return Array.from({ length: count }, (_, i) => {
+    const idx = isForward
+      ? (startIdx + i) % 60
+      : (startIdx - i + 60) % 60;
+    return SIXTY_JIAZI[idx];
+  });
+};
+
+// 计算流年干支（根据出生年份推算）
+const calculateYearGanZhi = (targetYear: number): string => {
+  // 1984年是甲子年，以此为基准
+  const baseYear = 1984;
+  const diff = targetYear - baseYear;
+  const idx = ((diff % 60) + 60) % 60;
+  return SIXTY_JIAZI[idx];
+};
 
 // Helper to extract JSON from markdown code blocks or raw text
 const extractJSON = (text: string): string => {
@@ -59,9 +90,16 @@ export const generateLifeAnalysis = async (input: UserInput): Promise<LifeDestin
 
   const daYunDirectionStr = isForward ? '顺行 (Forward)' : '逆行 (Backward)';
   
-  const directionExample = isForward 
-    ? "例如：第一步是【戊申】，第二步则是【己酉】（顺排）" 
-    : "例如：第一步是【戊申】，第二步则是【丁未】（逆排）";
+  // 前端预计算大运序列（10步大运）
+  const daYunSequence = calculateDaYunSequence(input.firstDaYun, isForward, 10);
+  
+  // 前端预计算流年干支（1-100岁）
+  const birthYearInt = parseInt(input.birthYear) || 1990;
+  const liuNianList: string[] = [];
+  for (let age = 1; age <= 100; age++) {
+    const year = birthYearInt + age - 1;
+    liuNianList.push(`${age}岁(${year}年)=${calculateYearGanZhi(year)}`);
+  }
 
   const userPrompt = `
 【命主基本信息】
@@ -79,17 +117,22 @@ export const generateLifeAnalysis = async (input: UserInput): Promise<LifeDestin
 1. 起运年龄：${input.startAge}岁（虚岁）
 2. 第一步大运：${input.firstDaYun}
 3. 排序方向：${daYunDirectionStr}
-   ${directionExample}
 
-【大运序列生成算法 - 必须严格执行】
-步骤1：锁定第一步大运【${input.firstDaYun}】
-步骤2：按六十甲子${isForward ? '顺序往后' : '逆序往前'}推算后续9步大运
-步骤3：填充chartPoints的daYun字段：
+【大运序列（已预计算，请直接使用）】
+${daYunSequence.map((dy, i) => `第${i + 1}步大运：${dy}（${startAgeInt + i * 10}-${startAgeInt + i * 10 + 9}岁）`).join('\n')}
+
+【流年干支对照表（已预计算，请直接使用）】
+${liuNianList.slice(0, 20).join(', ')}
+${liuNianList.slice(20, 40).join(', ')}
+${liuNianList.slice(40, 60).join(', ')}
+${liuNianList.slice(60, 80).join(', ')}
+${liuNianList.slice(80, 100).join(', ')}
+
+【大运填充规则】
 - Age 1 至 ${startAgeInt - 1}岁：daYun = "童限"
-- Age ${startAgeInt} 至 ${startAgeInt + 9}岁：daYun = "${input.firstDaYun}"（第1步）
-- Age ${startAgeInt + 10} 至 ${startAgeInt + 19}岁：daYun = [第2步大运]
-- Age ${startAgeInt + 20} 至 ${startAgeInt + 29}岁：daYun = [第3步大运]
-- 以此类推直到100岁
+- Age ${startAgeInt} 至 ${startAgeInt + 9}岁：daYun = "${daYunSequence[0]}"
+- Age ${startAgeInt + 10} 至 ${startAgeInt + 19}岁：daYun = "${daYunSequence[1]}"
+- 以此类推，每10年换一步大运
 
 【分析任务清单 - 缺一不可】
 □ 任务1：日主强弱判断（得令/得地/得势/得助 → 极强/偏强/中和/偏弱/极弱/从格）
@@ -128,7 +171,7 @@ export const generateLifeAnalysis = async (input: UserInput): Promise<LifeDestin
           { role: "user", content: userPrompt }
         ],
         response_format: { type: "json_object" },
-        temperature: 0.7
+        temperature: 0.3
       })
     });
 
@@ -148,9 +191,15 @@ export const generateLifeAnalysis = async (input: UserInput): Promise<LifeDestin
     const cleanedContent = extractJSON(content);
     const data = JSON.parse(cleanedContent);
 
-    // 简单校验数据完整性
-    if (!data.chartPoints || !Array.isArray(data.chartPoints)) {
-      throw new Error("模型返回的数据格式不正确（缺失 chartPoints）。");
+    // 完整性校验
+    const requiredFields = ['chartPoints', 'bazi', 'summary'];
+    const missingFields = requiredFields.filter(f => !data[f]);
+    if (missingFields.length > 0) {
+      throw new Error(`模型返回数据不完整，缺失字段: ${missingFields.join(', ')}`);
+    }
+    
+    if (!Array.isArray(data.chartPoints) || data.chartPoints.length === 0) {
+      throw new Error("模型返回的 chartPoints 格式不正确或为空。");
     }
 
     return {
@@ -173,7 +222,10 @@ export const generateLifeAnalysis = async (input: UserInput): Promise<LifeDestin
       },
     };
   } catch (error) {
-    console.error("Gemini/OpenAI API Error:", error);
+    // 仅在开发环境输出错误日志
+    if (import.meta.env.DEV) {
+      console.error("Gemini/OpenAI API Error:", error);
+    }
     throw error;
   }
 };

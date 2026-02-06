@@ -30,8 +30,11 @@ const App: React.FC = () => {
     try {
       const analysis = await generateLifeAnalysis(data);
       setResult(analysis);
-    } catch (err: any) {
-      setError(err.message || "命理测算过程中发生了意外错误，请重试。");
+    } catch (err) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : "命理测算过程中发生了意外错误，请重试。";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

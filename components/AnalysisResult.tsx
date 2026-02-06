@@ -31,7 +31,15 @@ const ScoreBar = ({ score }: { score: number }) => {
   );
 };
 
-const Card = ({ title, icon: Icon, content, score, colorClass }: any) => (
+interface CardProps {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  content: React.ReactNode;
+  score?: number;
+  colorClass: string;
+}
+
+const Card = ({ title, icon: Icon, content, score, colorClass }: CardProps) => (
   <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex flex-col h-full">
     <div className={`flex items-center justify-between mb-3 ${colorClass}`}>
       <div className="flex items-center gap-2">
