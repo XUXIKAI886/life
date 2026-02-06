@@ -27,19 +27,22 @@ const getStemPolarity = (pillar: string): 'YANG' | 'YIN' => {
 
 export const generateLifeAnalysis = async (input: UserInput): Promise<LifeDestinyResult> => {
   
-  const { apiKey, apiBaseUrl, modelName } = input;
+  // 从环境变量读取 API 配置
+  const apiKey = import.meta.env.VITE_API_KEY;
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const modelName = import.meta.env.VITE_API_MODEL;
 
   if (!apiKey || !apiKey.trim()) {
-    throw new Error("请在表单中填写有效的 API Key");
+    throw new Error("环境变量 VITE_API_KEY 未配置");
   }
   if (!apiBaseUrl || !apiBaseUrl.trim()) {
-    throw new Error("请在表单中填写有效的 API Base URL");
+    throw new Error("环境变量 VITE_API_BASE_URL 未配置");
   }
 
   // Remove trailing slash if present
   const cleanBaseUrl = apiBaseUrl.replace(/\/+$/, "");
-  // Use user provided model name or fallback
-  const targetModel = modelName && modelName.trim() ? modelName.trim() : "gemini-3-pro-preview";
+  // Use env model name or fallback
+  const targetModel = modelName && modelName.trim() ? modelName.trim() : "gpt-4o";
 
   const genderStr = input.gender === Gender.MALE ? '男 (乾造)' : '女 (坤造)';
   const startAgeInt = parseInt(input.startAge) || 1;

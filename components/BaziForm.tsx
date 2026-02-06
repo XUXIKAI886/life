@@ -1,7 +1,10 @@
 
 import React, { useState, useMemo } from 'react';
 import { UserInput, Gender } from '../types';
-import { Loader2, Sparkles, AlertCircle, TrendingUp, Settings } from 'lucide-react';
+import { Loader2, Sparkles, TrendingUp } from 'lucide-react';
+
+// 干支格式验证正则
+const GANZHI_PATTERN = /^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$/;
 
 interface BaziFormProps {
   onSubmit: (data: UserInput) => void;
@@ -19,35 +22,73 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
     hourPillar: '',
     startAge: '',
     firstDaYun: '',
-    modelName: 'gemini-3-pro-preview',
-    apiBaseUrl: 'https://max.openai365.top/v1',
-    apiKey: '',
   });
 
-  const [formErrors, setFormErrors] = useState<{modelName?: string, apiBaseUrl?: string, apiKey?: string}>({});
+  const [formErrors, setFormErrors] = useState<{
+    birthYear?: string;
+    startAge?: string;
+    yearPillar?: string;
+    monthPillar?: string;
+    dayPillar?: string;
+    hourPillar?: string;
+    firstDaYun?: string;
+  }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user types
-    if (name === 'apiBaseUrl' || name === 'apiKey' || name === 'modelName') {
+    if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors(prev => ({ ...prev, [name]: undefined }));
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate API Config
-    const errors: {modelName?: string, apiBaseUrl?: string, apiKey?: string} = {};
-    if (!formData.modelName.trim()) {
-      errors.modelName = '请输入模型名称';
+
+    const errors: typeof formErrors = {};
+
+    // 出生年份验证
+    const year = parseInt(formData.birthYear);
+    if (!formData.birthYear.trim()) {
+      errors.birthYear = '请输入出生年份';
+    } else if (isNaN(year) || year < 1900 || year > 2100) {
+      errors.birthYear = '请输入有效的年份 (1900-2100)';
     }
-    if (!formData.apiBaseUrl.trim()) {
-      errors.apiBaseUrl = '请输入 API Base URL';
+
+    // 起运年龄验证
+    const age = parseInt(formData.startAge);
+    if (!formData.startAge.trim()) {
+      errors.startAge = '请输入起运年龄';
+    } else if (isNaN(age) || age < 1 || age > 100) {
+      errors.startAge = '起运年龄必须在 1-100 之间';
     }
-    if (!formData.apiKey.trim()) {
-      errors.apiKey = '请输入 API Key';
+
+    // 干支格式验证
+    if (!formData.yearPillar.trim()) {
+      errors.yearPillar = '请输入年柱';
+    } else if (!GANZHI_PATTERN.test(formData.yearPillar.trim())) {
+      errors.yearPillar = '格式不正确（如：甲子）';
+    }
+    if (!formData.monthPillar.trim()) {
+      errors.monthPillar = '请输入月柱';
+    } else if (!GANZHI_PATTERN.test(formData.monthPillar.trim())) {
+      errors.monthPillar = '格式不正确（如：丙寅）';
+    }
+    if (!formData.dayPillar.trim()) {
+      errors.dayPillar = '请输入日柱';
+    } else if (!GANZHI_PATTERN.test(formData.dayPillar.trim())) {
+      errors.dayPillar = '格式不正确（如：戊辰）';
+    }
+    if (!formData.hourPillar.trim()) {
+      errors.hourPillar = '请输入时柱';
+    } else if (!GANZHI_PATTERN.test(formData.hourPillar.trim())) {
+      errors.hourPillar = '格式不正确（如：壬戌）';
+    }
+    if (!formData.firstDaYun.trim()) {
+      errors.firstDaYun = '请输入第一步大运';
+    } else if (!GANZHI_PATTERN.test(formData.firstDaYun.trim())) {
+      errors.firstDaYun = '格式不正确（如：丁卯）';
     }
 
     if (Object.keys(errors).length > 0) {
@@ -63,11 +104,9 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
     if (!formData.yearPillar) return '等待输入年柱...';
     
     const firstChar = formData.yearPillar.trim().charAt(0);
-    const yangStems = ['甲', '丙', '戊', '庚', '壬'];
     const yinStems = ['乙', '丁', '己', '辛', '癸'];
     
-    let isYangYear = true; // default assume Yang if unknown
-    if (yinStems.includes(firstChar)) isYangYear = false;
+    const isYangYear = !yinStems.includes(firstChar);
     
     let isForward = false;
     if (formData.gender === Gender.MALE) {
@@ -149,8 +188,9 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 value={formData.birthYear}
                 onChange={handleChange}
                 placeholder="如: 1990"
-                className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white font-bold ${formErrors.birthYear ? 'border-red-500 bg-red-50' : 'border-amber-200'}`}
               />
+              {formErrors.birthYear && <p className="text-red-500 text-xs mt-1">{formErrors.birthYear}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -160,11 +200,13 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 type="text"
                 name="yearPillar"
                 required
+                maxLength={2}
                 value={formData.yearPillar}
                 onChange={handleChange}
                 placeholder="如: 甲子"
-                className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold ${formErrors.yearPillar ? 'border-red-500 bg-red-50' : 'border-amber-200'}`}
               />
+              {formErrors.yearPillar && <p className="text-red-500 text-xs mt-1">{formErrors.yearPillar}</p>}
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">月柱 (Month)</label>
@@ -172,11 +214,13 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 type="text"
                 name="monthPillar"
                 required
+                maxLength={2}
                 value={formData.monthPillar}
                 onChange={handleChange}
                 placeholder="如: 丙寅"
-                className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold ${formErrors.monthPillar ? 'border-red-500 bg-red-50' : 'border-amber-200'}`}
               />
+              {formErrors.monthPillar && <p className="text-red-500 text-xs mt-1">{formErrors.monthPillar}</p>}
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">日柱 (Day)</label>
@@ -184,11 +228,13 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 type="text"
                 name="dayPillar"
                 required
+                maxLength={2}
                 value={formData.dayPillar}
                 onChange={handleChange}
                 placeholder="如: 戊辰"
-                className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold ${formErrors.dayPillar ? 'border-red-500 bg-red-50' : 'border-amber-200'}`}
               />
+              {formErrors.dayPillar && <p className="text-red-500 text-xs mt-1">{formErrors.dayPillar}</p>}
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">时柱 (Hour)</label>
@@ -196,11 +242,13 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 type="text"
                 name="hourPillar"
                 required
+                maxLength={2}
                 value={formData.hourPillar}
                 onChange={handleChange}
                 placeholder="如: 壬戌"
-                className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white text-center font-serif-sc font-bold ${formErrors.hourPillar ? 'border-red-500 bg-red-50' : 'border-amber-200'}`}
               />
+              {formErrors.hourPillar && <p className="text-red-500 text-xs mt-1">{formErrors.hourPillar}</p>}
             </div>
           </div>
         </div>
@@ -223,8 +271,9 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 value={formData.startAge}
                 onChange={handleChange}
                 placeholder="如: 3"
-                className="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-center font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-center font-bold ${formErrors.startAge ? 'border-red-500 bg-red-50' : 'border-indigo-200'}`}
               />
+              {formErrors.startAge && <p className="text-red-500 text-xs mt-1">{formErrors.startAge}</p>}
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">第一步大运</label>
@@ -232,63 +281,19 @@ const BaziForm: React.FC<BaziFormProps> = ({ onSubmit, isLoading }) => {
                 type="text"
                 name="firstDaYun"
                 required
+                maxLength={2}
                 value={formData.firstDaYun}
                 onChange={handleChange}
                 placeholder="如: 丁卯"
-                className="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-center font-serif-sc font-bold"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-center font-serif-sc font-bold ${formErrors.firstDaYun ? 'border-red-500 bg-red-50' : 'border-indigo-200'}`}
               />
+              {formErrors.firstDaYun && <p className="text-red-500 text-xs mt-1">{formErrors.firstDaYun}</p>}
             </div>
           </div>
            <p className="text-xs text-indigo-600/70 mt-2 text-center">
              当前大运排序规则：
              <span className="font-bold text-indigo-900">{daYunDirectionInfo}</span>
           </p>
-        </div>
-
-        {/* API Configuration Section */}
-        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-          <div className="flex items-center gap-2 mb-3 text-gray-700 text-sm font-bold">
-            <Settings className="w-4 h-4" />
-            <span>模型接口设置 (必填)</span>
-          </div>
-          <div className="space-y-3">
-             <div>
-               <label className="block text-xs font-bold text-gray-600 mb-1">使用模型</label>
-               <input
-                  type="text"
-                  name="modelName"
-                  value={formData.modelName}
-                  onChange={handleChange}
-                  placeholder="gemini-3-pro-preview"
-                  className={`w-full px-3 py-2 border rounded-lg text-xs font-mono outline-none ${formErrors.modelName ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:ring-2 focus:ring-gray-400'}`}
-                />
-                {formErrors.modelName && <p className="text-red-500 text-xs mt-1">{formErrors.modelName}</p>}
-             </div>
-             <div>
-               <label className="block text-xs font-bold text-gray-600 mb-1">API Base URL</label>
-               <input
-                  type="text"
-                  name="apiBaseUrl"
-                  value={formData.apiBaseUrl}
-                  onChange={handleChange}
-                  placeholder="https://max.openai365.top/v1"
-                  className={`w-full px-3 py-2 border rounded-lg text-xs font-mono outline-none ${formErrors.apiBaseUrl ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:ring-2 focus:ring-gray-400'}`}
-                />
-                {formErrors.apiBaseUrl && <p className="text-red-500 text-xs mt-1">{formErrors.apiBaseUrl}</p>}
-             </div>
-             <div>
-               <label className="block text-xs font-bold text-gray-600 mb-1">API Key</label>
-               <input
-                  type="password"
-                  name="apiKey"
-                  value={formData.apiKey}
-                  onChange={handleChange}
-                  placeholder="sk-..."
-                  className={`w-full px-3 py-2 border rounded-lg text-xs font-mono outline-none ${formErrors.apiKey ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:ring-2 focus:ring-gray-400'}`}
-                />
-                {formErrors.apiKey && <p className="text-red-500 text-xs mt-1">{formErrors.apiKey}</p>}
-             </div>
-          </div>
         </div>
 
         <button

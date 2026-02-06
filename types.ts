@@ -12,13 +12,8 @@ export interface UserInput {
   monthPillar: string; // 月柱
   dayPillar: string;   // 日柱
   hourPillar: string;  // 时柱
-  startAge: string;    // 起运年龄 (虚岁) - Changed to string to handle input field state easily, parse later
+  startAge: string;    // 起运年龄 (虚岁)
   firstDaYun: string;  // 第一步大运干支
-  
-  // New API Configuration Fields
-  modelName: string;   // 使用的模型名称
-  apiBaseUrl: string;
-  apiKey: string;
 }
 
 export interface KLinePoint {
