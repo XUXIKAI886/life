@@ -26,7 +26,7 @@ export interface KLinePoint {
   high: number;
   low: number;
   score: number;
-  reason: string; // 这里现在需要存储详细的流年描述
+  reason?: string; // 可选：流年描述
 }
 
 export interface AnalysisData {
