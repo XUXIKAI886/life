@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AnalysisData } from '../types';
-import { ScrollText, Briefcase, Coins, Activity, Users, Star, Info, Heart, Compass } from 'lucide-react';
+import { ScrollText, Briefcase, Coins, Activity, Users, Star, Info } from 'lucide-react';
 
 interface AnalysisResultProps {
   analysis: AnalysisData;
@@ -120,51 +120,6 @@ const AnalysisResult: React.FC<AnalysisResultProps> = ({ analysis }) => {
           score={analysis.familyScore}
           colorClass="text-purple-600" 
         />
-        
-        {/* Romance Card */}
-        {analysis.romance && (
-          <Card 
-            title="情感姻缘" 
-            icon={Heart} 
-            content={analysis.romance.analysis}
-            score={analysis.romanceScore}
-            colorClass="text-pink-600" 
-          />
-        )}
-        
-        {/* Five Elements Card */}
-        {analysis.fiveElements && (
-          <Card 
-            title="五行开运" 
-            icon={Compass} 
-            colorClass="text-cyan-600"
-            content={
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs font-bold text-gray-500">喜用:</span>
-                  <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">{analysis.fiveElements.favorable}</span>
-                  <span className="text-xs font-bold text-gray-500 ml-2">忌:</span>
-                  <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded">{analysis.fiveElements.unfavorable}</span>
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-gray-500">幸运色:</span>
-                  <span className="text-xs ml-2">{analysis.fiveElements.colors?.join('、')}</span>
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-gray-500">有利方位:</span>
-                  <span className="text-xs ml-2">{analysis.fiveElements.directions?.join('、')}</span>
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-gray-500">幸运数字:</span>
-                  <span className="text-xs ml-2">{analysis.fiveElements.numbers?.join('、')}</span>
-                </div>
-                <div className="pt-2 border-t border-gray-100">
-                  <p className="text-xs text-gray-600">{analysis.fiveElements.advice}</p>
-                </div>
-              </div>
-            }
-          />
-        )}
         
         {/* Static Score Explanation Card */}
         <Card
