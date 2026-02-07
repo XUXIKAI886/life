@@ -111,7 +111,9 @@ export const BAZI_SYSTEM_INSTRUCTION = `
 【评分规则 - 重要】
 所有 xxxScore 字段必须是 0-10 的整数（10分制）：
 - summaryScore、industryScore、wealthScore、healthScore、familyScore、romanceScore
-- 0-2分=极差，3-4分=差，5-6分=一般，7-8分=好，9-10分=极好
+- 评分标准：0-2分=极差，3-4分=差，5-6分=一般，7-8分=好，9-10分=极好
+- 评分原则：根据八字格局实际情况客观评分，不要因为分析维度增多而压低分数
+- 各维度评分相互独立，不受其他维度影响
 
 【K线数值计算规则】
 K线数值范围0-100（注意：这与评分的0-10不同），计算依据：
