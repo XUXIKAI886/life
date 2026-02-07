@@ -73,6 +73,10 @@ export interface AnalysisData {
   
   family: string;
   familyScore: number; // 0-10
+  
+  // 情感分析
+  romance?: string;
+  romanceScore?: number;
 }
 
 export interface LifeDestinyResult {

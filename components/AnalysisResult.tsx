@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AnalysisData } from '../types';
-import { ScrollText, Briefcase, Coins, Activity, Users, Star, Info } from 'lucide-react';
+import { ScrollText, Briefcase, Coins, Activity, Users, Star, Info, Heart } from 'lucide-react';
 
 interface AnalysisResultProps {
   analysis: AnalysisData;
@@ -120,6 +120,15 @@ const AnalysisResult: React.FC<AnalysisResultProps> = ({ analysis }) => {
           score={analysis.familyScore}
           colorClass="text-purple-600" 
         />
+        {analysis.romance && (
+          <Card 
+            title="情感姻缘" 
+            icon={Heart} 
+            content={analysis.romance} 
+            score={analysis.romanceScore}
+            colorClass="text-pink-600" 
+          />
+        )}
         
         {/* Static Score Explanation Card */}
         <Card

@@ -227,6 +227,8 @@ ${liuNianList.slice(80, 100).join(', ')}
         healthScore: data.healthScore || 5,
         family: data.family || "无",
         familyScore: data.familyScore || 5,
+        romance: data.romance || null,
+        romanceScore: data.romanceScore || 5,
       },
     };
   } catch (error) {

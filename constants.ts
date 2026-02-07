@@ -90,6 +90,8 @@ export const BAZI_SYSTEM_INSTRUCTION = `
   "healthScore": 5,
   "family": "六亲关系深度分析（300字以上），必须包含：与父母关系、兄弟姐妹缘分、子女运势、贵人类型、小人防范、人际交往建议",
   "familyScore": 7,
+  "romance": "情感姻缘分析（300字以上），必须包含：婚姻宫分析、配偶星特征、桃花运势、最佳婚恋时机、感情注意事项",
+  "romanceScore": 7,
   "chartPoints": [
     {
       "age": 1,
